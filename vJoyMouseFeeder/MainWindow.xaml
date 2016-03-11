@@ -1,0 +1,9 @@
+﻿<Window x:Class="vJoyMouseFeeder.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525">
+    <Grid>
+        <Label Name="PositionLabel" HorizontalAlignment="Left" Margin="160,153,0,0" VerticalAlignment="Top" Width="235"/>
+
+    </Grid>
+</Window>
