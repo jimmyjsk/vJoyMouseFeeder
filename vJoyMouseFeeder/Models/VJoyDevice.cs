@@ -10,38 +10,35 @@ namespace vJoyMouseFeeder.Entities
 {
     public class VJoyDevice
     {
-        static public vJoy joystick;
-        static public vJoy.JoystickState iReport;
-        static public uint id = 1;
+        private vJoy _joystick;
+        private vJoy.JoystickState _iReport;
 
-        public void Test()
+        public bool Connect(uint id)
         {
-            //PositionLabel.Content = "X: " + p.X + ", Y:" + p.Y;
-
             // Create one joystick object and a position structure.
-            joystick = new vJoy();
-            iReport = new vJoy.JoystickState();
+            _joystick = new vJoy();
+            _iReport = new vJoy.JoystickState();
 
             // Device ID can only be in the range 1-16
             //if (args.Length>0 && !String.IsNullOrEmpty(args[0]))
             //    id = Convert.ToUInt32(args[0]);
             if (id <= 0 || id > 16)
             {
-                Debug.WriteLine("Illegal device ID {0}\nExit!",id); 
-                return;
+                Debug.WriteLine("Illegal device ID {0}\nExit!", id);
+                return false;
             }
 
             // Get the driver attributes (Vendor ID, Product ID, Version Number)
-            if (!joystick.vJoyEnabled())
+            if (!_joystick.vJoyEnabled())
             {
                 Debug.WriteLine("vJoy driver not enabled: Failed Getting vJoy attributes.\n");
-                return;
+                return false;
             }
             else
-                Debug.WriteLine("Vendor: {0}\nProduct :{1}\nVersion Number:{2}\n", joystick.GetvJoyManufacturerString(), joystick.GetvJoyProductString(), joystick.GetvJoySerialNumberString());
+                Debug.WriteLine("Vendor: {0}\nProduct :{1}\nVersion Number:{2}\n", _joystick.GetvJoyManufacturerString(), _joystick.GetvJoyProductString(), _joystick.GetvJoySerialNumberString());
 
             // Get the state of the requested device
-            VjdStat status = joystick.GetVJDStatus(id);
+            VjdStat status = _joystick.GetVJDStatus(id);
             switch (status)
             {
                 case VjdStat.VJD_STAT_OWN:
@@ -52,30 +49,30 @@ namespace vJoyMouseFeeder.Entities
                     break;
                 case VjdStat.VJD_STAT_BUSY:
                     Debug.WriteLine("vJoy Device {0} is already owned by another feeder\nCannot continue\n", id);
-                    return;
+                    return false;
                 case VjdStat.VJD_STAT_MISS:
                     Debug.WriteLine("vJoy Device {0} is not installed or disabled\nCannot continue\n", id);
-                    return;
+                    return false;
                 default:
                     Debug.WriteLine("vJoy Device {0} general error\nCannot continue\n", id);
-                    return;
+                    return false;
             };
 
             // Check which axes are supported
-            bool AxisX = joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_X);
-            bool AxisY = joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_Y);
-            bool AxisZ = joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_Z);
-            bool AxisRX = joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_RX);
-            bool AxisRY = joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_RY);
-            bool AxisRZ = joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_RZ);
-            bool AxisSL0 = joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_SL0);
-            bool AxisSL1 = joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_SL1);
-            bool AxisWHL = joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_WHL);
-            bool AxisPOW = joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_POV);
+            bool AxisX = _joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_X);
+            bool AxisY = _joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_Y);
+            bool AxisZ = _joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_Z);
+            bool AxisRX = _joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_RX);
+            bool AxisRY = _joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_RY);
+            bool AxisRZ = _joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_RZ);
+            bool AxisSL0 = _joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_SL0);
+            bool AxisSL1 = _joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_SL1);
+            bool AxisWHL = _joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_WHL);
+            bool AxisPOW = _joystick.GetVJDAxisExist(id, HID_USAGES.HID_USAGE_POV);
             // Get the number of buttons and POV Hat switchessupported by this vJoy device
-            int nButtons = joystick.GetVJDButtonNumber(id);
-            int ContPovNumber = joystick.GetVJDContPovNumber(id);
-            int DiscPovNumber = joystick.GetVJDDiscPovNumber(id);
+            int nButtons = _joystick.GetVJDButtonNumber(id);
+            int ContPovNumber = _joystick.GetVJDContPovNumber(id);
+            int DiscPovNumber = _joystick.GetVJDDiscPovNumber(id);
 
             // Print results
             Debug.WriteLine("\nvJoy Device {0} capabilities:\n", id);
@@ -95,22 +92,27 @@ namespace vJoyMouseFeeder.Entities
 
             // Test if DLL matches the driver
             UInt32 DllVer = 0, DrvVer = 0;
-            bool match = joystick.DriverMatch(ref DllVer, ref DrvVer);
+            bool match = _joystick.DriverMatch(ref DllVer, ref DrvVer);
             if (match)
                 Debug.WriteLine("Version of Driver Matches DLL Version ({0:X})\n", DllVer);
             else
                 Debug.WriteLine("Version of Driver ({0:X}) does NOT match DLL Version ({1:X})\n", DrvVer, DllVer);
 
-
             // Acquire the target
-            if ((status == VjdStat.VJD_STAT_OWN) || ((status == VjdStat.VJD_STAT_FREE) && (!joystick.AcquireVJD(id))))
+            if ((status == VjdStat.VJD_STAT_OWN) || ((status == VjdStat.VJD_STAT_FREE) && (!_joystick.AcquireVJD(id))))
             {
                 Debug.WriteLine("Failed to acquire vJoy device number {0}.\n", id);
-                return;
+                return false;
             }
             else
+            {
                 Debug.WriteLine("Acquired: vJoy device number {0}.\n", id);
+                return true;
+            }
+        }
 
+        public void Test(uint id)
+        {
             int X, Y, Z, ZR, XR;
             uint count = 0;
             long maxval = 0;
@@ -121,66 +123,68 @@ namespace vJoyMouseFeeder.Entities
             XR = 60;
             ZR = 80;
 
-            joystick.GetVJDAxisMax(id, HID_USAGES.HID_USAGE_X, ref maxval);
+            _joystick.GetVJDAxisMax(id, HID_USAGES.HID_USAGE_X, ref maxval);
 
             bool res;
             // Reset this device to default values
-            joystick.ResetVJD(id);
+            _joystick.ResetVJD(id);
 
             // Feed the device in endless loop
-            while (true)
+            while (count < 640)
             {
                 // Set position of 4 axes
-                res = joystick.SetAxis(X, id, HID_USAGES.HID_USAGE_X);
-                res = joystick.SetAxis(Y, id, HID_USAGES.HID_USAGE_Y);
-                res = joystick.SetAxis(Z, id, HID_USAGES.HID_USAGE_Z);
-                res = joystick.SetAxis(XR, id, HID_USAGES.HID_USAGE_RX);
-                res = joystick.SetAxis(ZR, id, HID_USAGES.HID_USAGE_RZ);
+                res = _joystick.SetAxis(X, id, HID_USAGES.HID_USAGE_X);
+                res = _joystick.SetAxis(Y, id, HID_USAGES.HID_USAGE_Y);
+                res = _joystick.SetAxis(Z, id, HID_USAGES.HID_USAGE_Z);
+                res = _joystick.SetAxis(XR, id, HID_USAGES.HID_USAGE_RX);
+                res = _joystick.SetAxis(ZR, id, HID_USAGES.HID_USAGE_RZ);
 
                 // Press/Release Buttons
-                res = joystick.SetBtn(true, id, count / 50);
-                res = joystick.SetBtn(false, id, 1 + count / 50);
+                res = _joystick.SetBtn(true, id, count / 50);
+                res = _joystick.SetBtn(false, id, 1 + count / 50);
 
                 // If Continuous POV hat switches installed - make them go round
                 // For high values - put the switches in neutral state
+                /*
                 if (ContPovNumber > 0)
                 {
                     if ((count * 70) < 30000)
                     {
-                        res = joystick.SetContPov(((int)count * 70), id, 1);
-                        res = joystick.SetContPov(((int)count * 70) + 2000, id, 2);
-                        res = joystick.SetContPov(((int)count * 70) + 4000, id, 3);
-                        res = joystick.SetContPov(((int)count * 70) + 6000, id, 4);
+                        res = _joystick.SetContPov(((int)count * 70), id, 1);
+                        res = _joystick.SetContPov(((int)count * 70) + 2000, id, 2);
+                        res = _joystick.SetContPov(((int)count * 70) + 4000, id, 3);
+                        res = _joystick.SetContPov(((int)count * 70) + 6000, id, 4);
                     }
                     else
                     {
-                        res = joystick.SetContPov(-1, id, 1);
-                        res = joystick.SetContPov(-1, id, 2);
-                        res = joystick.SetContPov(-1, id, 3);
-                        res = joystick.SetContPov(-1, id, 4);
+                        res = _joystick.SetContPov(-1, id, 1);
+                        res = _joystick.SetContPov(-1, id, 2);
+                        res = _joystick.SetContPov(-1, id, 3);
+                        res = _joystick.SetContPov(-1, id, 4);
                     };
                 };
-
+                */
+                /*
                 // If Discrete POV hat switches installed - make them go round
                 // From time to time - put the switches in neutral state
                 if (DiscPovNumber > 0)
                 {
                     if (count < 550)
                     {
-                        joystick.SetDiscPov((((int)count / 20) + 0) % 4, id, 1);
-                        joystick.SetDiscPov((((int)count / 20) + 1) % 4, id, 2);
-                        joystick.SetDiscPov((((int)count / 20) + 2) % 4, id, 3);
-                        joystick.SetDiscPov((((int)count / 20) + 3) % 4, id, 4);
+                        _joystick.SetDiscPov((((int)count / 20) + 0) % 4, id, 1);
+                        _joystick.SetDiscPov((((int)count / 20) + 1) % 4, id, 2);
+                        _joystick.SetDiscPov((((int)count / 20) + 2) % 4, id, 3);
+                        _joystick.SetDiscPov((((int)count / 20) + 3) % 4, id, 4);
                     }
                     else
                     {
-                        joystick.SetDiscPov(-1, id, 1);
-                        joystick.SetDiscPov(-1, id, 2);
-                        joystick.SetDiscPov(-1, id, 3);
-                        joystick.SetDiscPov(-1, id, 4);
+                        _joystick.SetDiscPov(-1, id, 1);
+                        _joystick.SetDiscPov(-1, id, 2);
+                        _joystick.SetDiscPov(-1, id, 3);
+                        _joystick.SetDiscPov(-1, id, 4);
                     };
                 };
-
+                */
                 System.Threading.Thread.Sleep(20);
                 //Debug.WriteLine("Mouse position - x: " + tracker.X + ", y: " + tracker.Y);
                 X += 150; if (X > maxval) X = 0;

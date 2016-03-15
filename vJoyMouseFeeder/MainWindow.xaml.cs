@@ -19,6 +19,7 @@ using Point = System.Drawing.Point;
 using vJoyInterfaceWrap;
 using System.Diagnostics;
 using vJoyMouseFeeder.Entities;
+using vJoyMouseFeeder.ViewModel;
 
 namespace vJoyMouseFeeder
 {
@@ -27,14 +28,31 @@ namespace vJoyMouseFeeder
     /// </summary>
     public partial class MainWindow : Window
     {
+        private MainWindowViewModel _context;
+
         public MainWindow()
         {
             InitializeComponent();
+            _context = new MainWindowViewModel();
+            this.DataContext = _context;
+        }
 
-            MouseTracker tracker = MouseTracker.GetTracker();
-            tracker.Start();
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            if (DataContext != null && DataContext is MainWindowViewModel)
+                ((MainWindowViewModel)DataContext).Dispose();
+        }
 
-            this.DataContext = tracker;
+        //using simple event handlers for testing.
+        // TODO refactor to commands
+        private void InitializeButton_Click(object sender, RoutedEventArgs e)
+        {
+            _context.JoystickDevice.Connect(1);
+        }
+
+        private void StartButton_Click(object sender, RoutedEventArgs e)
+        {
+            _context.JoystickDevice.Test(1);
         }
     }
 }

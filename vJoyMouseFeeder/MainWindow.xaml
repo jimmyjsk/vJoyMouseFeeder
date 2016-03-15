@@ -1,11 +1,13 @@
 ﻿<Window x:Class="vJoyMouseFeeder.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="525" Closed="Window_Closed">
     <Grid>
-        <WrapPanel Orientation="Horizontal">
-            <TextBlock Text="{Binding X}" />
-            <TextBlock Text="{Binding Y}" />
+        <WrapPanel Orientation="Vertical">
+            <TextBlock Text="{Binding Tracker.X}" />
+            <TextBlock Text="{Binding Tracker.Y}" />
+            <Button Name="InitializeButton" Width="150" Height="30" Content="Initialize" Click="InitializeButton_Click"/>
+            <Button Name="StartButton" Width="150" Height="30" Content="Start" Click="StartButton_Click"/>
         </WrapPanel>
     </Grid>
 </Window>

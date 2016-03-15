@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -19,14 +20,15 @@ namespace vJoyMouseFeeder.Entities
         public event PropertyChangedEventHandler PropertyChanged;
 
         private static MouseTracker _tracker;
-        private Thread thread;
-        private bool cont = true;
+        private Thread _thread;
+        private bool _cont = true;
+        private bool _running = false;
         private int _x;
         private int _y;
         private MouseTracker()
         {
 
-            thread = new Thread(new ThreadStart(ThreadStartMethod));
+            _thread = new Thread(new ThreadStart(ThreadStartMethod));
         }
 
         public int X
@@ -60,20 +62,32 @@ namespace vJoyMouseFeeder.Entities
             }
         }
 
+        public bool Running
+        {
+            get
+            {
+                return _running;
+            }
+        }
+
         public void Start()
         {
-            cont = true;
-            thread.Start();
+            _cont = true;
+            _thread.Start();
         }
 
         public void Stop()
         {
-            cont = false;
+            _cont = false;
         }
 
         public void ThreadStartMethod()
         {
-            while (cont)
+            _running = true;
+            if(PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs("Running"));
+            Debug.WriteLine("CaptureThreadStarted");
+            while (_cont)
             {
                 //Logic
                 Point p = new Point();
@@ -83,6 +97,10 @@ namespace vJoyMouseFeeder.Entities
                 this.Y = p.Y;
                 Thread.Sleep(5);
             }
+            Debug.WriteLine("CaptureThreadStopped");
+            _running = false;
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs("Running"));
         }
 
         public static MouseTracker GetTracker()
