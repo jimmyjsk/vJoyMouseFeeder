@@ -81,7 +81,7 @@ namespace vJoyMouseFeeder.Entities
             _cont = false;
         }
 
-        public void ThreadStartMethod()
+        private void ThreadStartMethod()
         {
             _running = true;
             if(PropertyChanged != null)

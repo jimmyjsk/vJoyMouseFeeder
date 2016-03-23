@@ -7,7 +7,7 @@
             <TextBlock Text="{Binding Tracker.X}" />
             <TextBlock Text="{Binding Tracker.Y}" />
             <Button Name="InitializeButton" Width="150" Height="30" Content="Initialize" Click="InitializeButton_Click"/>
-            <Button Name="StartButton" Width="150" Height="30" Content="Start" Click="StartButton_Click"/>
+            <Button Name="StartButton" Width="150" Height="30" Content="Toggle Feeding" Click="ToggleButton_Click"/>
         </WrapPanel>
     </Grid>
 </Window>

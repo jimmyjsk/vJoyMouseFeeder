@@ -48,11 +48,15 @@ namespace vJoyMouseFeeder
         private void InitializeButton_Click(object sender, RoutedEventArgs e)
         {
             _context.JoystickDevice.Connect(1);
+            _context.JoystickDevice.GetCapabilities();
         }
 
-        private void StartButton_Click(object sender, RoutedEventArgs e)
+        private void ToggleButton_Click(object sender, RoutedEventArgs e)
         {
-            _context.JoystickDevice.Test(1);
+            if (_context.JoystickDevice.Feeding)
+                _context.JoystickDevice.StopFeeding();
+            else
+                _context.JoystickDevice.StartFeeding(_context.Tracker);
         }
     }
 }
